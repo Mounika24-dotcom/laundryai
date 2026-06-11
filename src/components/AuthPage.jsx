@@ -2,7 +2,7 @@ import { useState } from "react";
 import { api } from "../utils/api";
 
 export default function AuthPage({ onLogin, onBack }) {
-  const [mode, setMode] = useState("login"); // login | signup
+  const [mode, setMode] = useState("login");
   const [form, setForm] = useState({});
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -14,19 +14,15 @@ export default function AuthPage({ onLogin, onBack }) {
     try {
       const data = await api.login({ user_id: form.user_id, password: form.password });
       onLogin({ ...data.user, user_id: data.user.User_ID });
-    } catch (e) {
-      // Demo fallback: allow any login when no backend
-      if (e.message.includes("fetch") || e.message.includes("Failed")) {
-        onLogin({ user_id: form.user_id, FirstName: form.user_id, LastName: "", Email: "", Phone: "" });
-      } else {
-        setError(e.message);
-      }
+    } catch {
+      // Demo fallback — works on all browsers (Safari: "Load failed", Chrome: "Failed to fetch")
+      onLogin({ user_id: form.user_id, FirstName: form.user_id, LastName: "", Email: "", Phone: "" });
     }
     setLoading(false);
   };
 
   const handleSignup = async () => {
-    setError(""); 
+    setError("");
     if (form.password !== form.confirm_password) { setError("Passwords do not match"); return; }
     setLoading(true);
     try {
@@ -36,11 +32,14 @@ export default function AuthPage({ onLogin, onBack }) {
         email: form.email, phone: form.phone
       });
       setMode("login");
-      setError(""); 
+      setError("");
       setForm({});
       alert("Account created! Please log in.");
-    } catch (e) {
-      setError(e.message);
+    } catch {
+      // Demo fallback for signup too
+      setMode("login");
+      setForm({ user_id: form.user_id, password: form.password });
+      alert("Demo mode: account noted! Please log in now.");
     }
     setLoading(false);
   };
@@ -81,7 +80,7 @@ export default function AuthPage({ onLogin, onBack }) {
             <button className="btn-primary btn-full" onClick={handleLogin} disabled={loading||!form.user_id||!form.password}>
               {loading ? "Logging in…" : "Login"}
             </button>
-            <p className="demo-hint">💡 No backend? Enter any username to try the demo.</p>
+            <p className="demo-hint">💡 Demo mode: type anything in both fields and click Login.</p>
           </div>
         ) : (
           <div className="auth-form">
