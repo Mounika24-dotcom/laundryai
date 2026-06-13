@@ -4,7 +4,7 @@ import AuthPage from "./components/AuthPage";
 import Dashboard from "./components/Dashboard";
 import BookingModal from "./components/BookingModal";
 import AIAdvisor from "./components/AIAdvisor";
-import AdminDashboard from "./components/AdminDashboard";
+import WolframAnalytics from "./components/WolframAnalytics";
 import Header from "./components/Header";
 import HistoryTab from "./components/HistoryTab";
 import NotificationToast from "./components/NotificationToast";
@@ -109,6 +109,7 @@ export default function App() {
         )}
         {activeTab === "ai"      && <AIAdvisor machines={machines} userName={userName} />}
         {activeTab === "history" && <HistoryTab userName={userName} userId={user?.user_id} useDemo={useDemo} />}
+        {activeTab === "wolfram"  && <WolframAnalytics machines={machines} />}
         {activeTab === "admin"   && <AdminDashboard />}
       </main>
 

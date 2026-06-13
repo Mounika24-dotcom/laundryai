@@ -36,6 +36,7 @@ export default function Header({ activeTab, setActiveTab, machines, userName, on
         {[
           { id: "dashboard", label: "🏠 Machines" },
           { id: "ai", label: "✨ AI Advisor" },
+          { id: "wolfram", label: "📐 Wolfram" },
           { id: "history", label: "📋 My History" },
           { id: "admin", label: "📊 Admin" },
         ].map((tab) => (
