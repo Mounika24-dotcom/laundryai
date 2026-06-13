@@ -634,3 +634,86 @@ body {
   .bstat { min-width: 80px; }
   .kpi-row { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ══════════════════════════════════════════════
+   WOLFRAM ANALYTICS
+══════════════════════════════════════════════ */
+.wolfram-badge-row {
+  display: flex; gap: 16px; align-items: center;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 20px;
+  flex-wrap: wrap;
+}
+.wolfram-badge {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; font-weight: 700; color: #c04000;
+  white-space: nowrap;
+}
+.wolfram-logo {
+  background: #c04000; color: white;
+  font-size: 13px; font-weight: 900;
+  padding: 3px 8px; border-radius: 6px;
+  font-family: "Courier New", monospace;
+}
+.wolfram-desc { font-size: 13px; color: var(--text-soft); line-height: 1.6; }
+
+.wolfram-stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.w-stat {
+  background: var(--bg); border-radius: 10px;
+  padding: 14px; text-align: center;
+  border: 1px solid var(--border);
+}
+.w-stat-val { font-size: 26px; font-weight: 800; color: var(--teal); }
+.w-stat-label { font-size: 11px; color: var(--text-soft); margin-top: 4px; }
+
+.wolfram-results { display: flex; flex-direction: column; gap: 16px; }
+.wolfram-formula {
+  background: #1a1a2e; border-radius: 8px;
+  padding: 12px 16px; display: flex; gap: 12px; align-items: center;
+}
+.formula-label { font-size: 11px; color: #888; font-family: "Courier New"; white-space: nowrap; }
+.formula-text { font-size: 13px; color: #a8edea; font-family: "Courier New"; }
+
+.wolfram-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.wm-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px; text-align: center;
+}
+.wm-symbol { font-size: 20px; font-weight: 900; color: #c04000; font-family: "Courier New"; }
+.wm-val { font-size: 22px; font-weight: 700; color: var(--teal); margin: 4px 0; }
+.wm-label { font-size: 11px; color: var(--text-soft); }
+
+.wolfram-insight { background: var(--bg); border-radius: 10px; padding: 14px 16px; }
+.insight-title { font-size: 12px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+.optimal-times { display: flex; gap: 8px; flex-wrap: wrap; }
+.optimal-badge {
+  background: #e6f4f3; color: var(--teal);
+  border: 1px solid var(--mint); border-radius: 6px;
+  padding: 4px 10px; font-size: 12px; font-weight: 600;
+}
+.efficiency-text { font-size: 13px; color: var(--text); line-height: 1.7; }
+
+.wolfram-query-box {
+  background: #1a1a2e; border-radius: 8px;
+  padding: 12px 16px; margin-bottom: 12px;
+}
+.query-label { font-size: 10px; color: #888; margin-bottom: 6px; font-family: "Courier New"; }
+.query-text { font-size: 13px; color: #f0c080; font-family: "Courier New"; }
+
+.wolfram-answer {
+  display: flex; align-items: center; gap: 12px;
+  background: #fff8f0; border: 1px solid #f0c080;
+  border-radius: 8px; padding: 12px 16px;
+  font-size: 13px; color: var(--text);
+}
+.w-logo-sm {
+  background: #c04000; color: white;
+  font-size: 10px; font-weight: 900;
+  padding: 2px 6px; border-radius: 4px;
+  font-family: "Courier New"; white-space: nowrap; flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .wolfram-stats-row { grid-template-columns: repeat(2, 1fr); }
+  .wolfram-metrics { grid-template-columns: repeat(2, 1fr); }
+}
