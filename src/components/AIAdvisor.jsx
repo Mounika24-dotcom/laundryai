@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatAIResponse, formatChatMessage } from "../utils/formatResponse";
 
 const PEAK_DATA = [
   { hour: "6 AM", load: 10 }, { hour: "7 AM", load: 25 }, { hour: "8 AM", load: 55 },
@@ -212,7 +213,7 @@ Be concise, practical, and friendly. Give specific time recommendations. Use 1-2
           </button>
         </div>
         {advice ? (
-          <div className="ai-advice">{advice}</div>
+          <div className="ai-advice" dangerouslySetInnerHTML={{ __html: formatAIResponse(advice) }} />
         ) : (
           <div className="ai-placeholder">
             Click "Get Advice" for personalized laundry scheduling based on today's usage patterns.
@@ -231,7 +232,7 @@ Be concise, practical, and friendly. Give specific time recommendations. Use 1-2
           {chatHistory.map((msg, i) => (
             <div key={i} className={`chat-msg ${msg.role}`}>
               <span className="chat-role">{msg.role === "user" ? "You" : "AI"}</span>
-              <span className="chat-text">{msg.content}</span>
+              <span className="chat-text" dangerouslySetInnerHTML={{ __html: msg.role === "assistant" ? formatChatMessage(msg.content) : msg.content }} />
             </div>
           ))}
           {loading && chatHistory.length > 0 && (

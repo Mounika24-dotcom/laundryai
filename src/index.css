@@ -717,3 +717,72 @@ body {
   .wolfram-stats-row { grid-template-columns: repeat(2, 1fr); }
   .wolfram-metrics { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ══════════════════════════════════════════════
+   FORMATTED AI RESPONSE STYLES
+══════════════════════════════════════════════ */
+.fmt-para {
+  margin: 0 0 8px 0;
+  line-height: 1.75;
+  color: var(--text);
+  font-size: 14px;
+}
+.fmt-para:last-child { margin-bottom: 0; }
+
+.fmt-list-item {
+  padding: 3px 0 3px 16px;
+  position: relative;
+  line-height: 1.6;
+  font-size: 14px;
+  color: var(--text);
+}
+.fmt-list-item::before {
+  content: "›";
+  position: absolute;
+  left: 0;
+  color: var(--teal);
+  font-weight: 700;
+}
+.fmt-numbered::before {
+  content: "◆";
+  font-size: 8px;
+  top: 7px;
+  color: var(--teal);
+}
+.fmt-section-header {
+  font-weight: 700;
+  color: var(--teal);
+  font-size: 13px;
+  margin: 10px 0 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.ai-advice strong { color: var(--teal); }
+.ai-advice em { color: var(--text-soft); font-style: italic; }
+
+.chat-text strong { color: var(--teal); font-weight: 600; }
+.chat-msg.assistant .chat-text strong { color: var(--teal); }
+
+/* ── UI POLISH: improved input focus states ── */
+input:focus {
+  border-color: var(--teal) !important;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(11, 94, 90, 0.1);
+}
+
+/* ── improved chat bubble spacing ── */
+.chat-msg {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.chat-msg:last-child { border-bottom: none; }
+
+/* ── machine card hover ── */
+.machine-card {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.machine-card.available:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(11,94,90,0.12);
+}
