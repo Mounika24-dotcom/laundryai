@@ -1,15 +1,96 @@
-import { getStatusLabel, getStatusColor } from "../utils/machines";
+import { useState, useEffect } from "react";
+import { getStatusLabel, getStatusColor, generateMachines } from "../utils/machines";
+import { api } from "../utils/api";
 
-export default function Dashboard({ machines, userName, onSelect, onCancel }) {
+export default function Dashboard({ machines: propMachines, userName, onSelect, onCancel, onMachinesLoaded }) {
+  const [machines, setMachines] = useState(propMachines);
+  const [loading, setLoading] = useState(true);
+  const [lastFetched, setLastFetched] = useState(null);
+  const [fetchError, setFetchError] = useState(null);
+
+  // Fetch machine data from API on mount and every 30s
+  useEffect(() => {
+    fetchMachines();
+    const interval = setInterval(fetchMachines, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Sync with parent prop changes (bookings, cancellations)
+  useEffect(() => {
+    setMachines(propMachines);
+  }, [propMachines]);
+
+  const fetchMachines = async () => {
+    try {
+      const data = await api.getMachines();
+      if (data && data.machines) {
+        setMachines(data.machines);
+        if (onMachinesLoaded) onMachinesLoaded(data.machines);
+        setFetchError(null);
+      }
+    } catch {
+      // Backend not available — use prop data (demo mode)
+      setFetchError("demo");
+    } finally {
+      setLoading(false);
+      setLastFetched(new Date().toLocaleTimeString());
+    }
+  };
+
   const floors = [...new Set(machines.map((m) => m.floor))];
+  const available = machines.filter(m => m.status === "available").length;
+  const inUse = machines.filter(m => m.status === "in_use").length;
+  const reserved = machines.filter(m => m.status === "reserved").length;
+  const done = machines.filter(m => m.status === "done").length;
+
+  if (loading) {
+    return (
+      <div className="tab-content">
+        <div className="loading-state">
+          <div className="loading-spinner" />
+          <p>Fetching machine status...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="tab-content">
-      <div className="section-header">
-        <h2>Machine Status</h2>
-        <p>Real-time availability across all floors</p>
+      {/* Stats summary bar */}
+      <div className="dashboard-stats">
+        <div className="ds-card ds-available">
+          <div className="ds-num">{available}</div>
+          <div className="ds-label">Available</div>
+        </div>
+        <div className="ds-card ds-inuse">
+          <div className="ds-num">{inUse}</div>
+          <div className="ds-label">In Use</div>
+        </div>
+        <div className="ds-card ds-reserved">
+          <div className="ds-num">{reserved}</div>
+          <div className="ds-label">Reserved</div>
+        </div>
+        <div className="ds-card ds-done">
+          <div className="ds-num">{done}</div>
+          <div className="ds-label">Collect Now</div>
+        </div>
       </div>
 
+      {/* API status indicator */}
+      <div className="api-status-bar">
+        <span className={`api-dot ${fetchError ? "demo" : "live"}`} />
+        <span className="api-label">
+          {fetchError === "demo"
+            ? "Demo mode — showing sample data"
+            : `Live data via GET /api/machines`}
+        </span>
+        {lastFetched && (
+          <span className="api-time">Last updated: {lastFetched}</span>
+        )}
+        <button className="btn-refresh" onClick={fetchMachines} title="Refresh">⟳ Refresh</button>
+      </div>
+
+      {/* Machine floors */}
       {floors.map((floor) => (
         <div key={floor} className="floor-section">
           <div className="floor-label">{floor}</div>
@@ -41,22 +122,43 @@ function MachineCard({ machine, userName, onSelect, onCancel }) {
   const canBook = status === "available";
   const isSpinning = status === "in_use";
 
+  // Progress percentage for in-use machines
+  const maxTime = 60;
+  const progressPct = status === "in_use" && timeRemaining != null
+    ? Math.max(0, Math.min(100, ((maxTime - timeRemaining) / maxTime) * 100))
+    : 0;
+
   return (
     <div className={`machine-card ${status} ${isMyMachine ? "my-machine" : ""}`}>
       {isMyMachine && <div className="my-badge">Yours</div>}
 
-      {/* Washing machine door visual */}
+      {/* Status indicator strip */}
+      <div className="card-status-strip" style={{ background: statusColor }} />
+
+      {/* Machine visual */}
       <div className="machine-door-wrap">
         <div className={`machine-door ${isSpinning ? "spinning" : ""}`} style={{ borderColor: statusColor }}>
-          <div className="door-inner" style={{ background: statusColor + "22" }}>
+          <div className="door-inner" style={{ background: statusColor + "18" }}>
             <div className="door-center" style={{ background: statusColor }}>
               {status === "available" && <span>✓</span>}
-              {status === "in_use" && <span>↻</span>}
-              {status === "reserved" && <span>🔒</span>}
-              {status === "done" && <span>!</span>}
+              {status === "in_use"    && <span>↻</span>}
+              {status === "reserved" && <span>⏰</span>}
+              {status === "done"     && <span>!</span>}
             </div>
           </div>
         </div>
+        {/* Circular progress ring for in-use */}
+        {status === "in_use" && (
+          <svg className="progress-ring" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="36" fill="none" stroke="#e5e7eb" strokeWidth="4"/>
+            <circle cx="40" cy="40" r="36" fill="none" stroke={statusColor} strokeWidth="4"
+              strokeDasharray={`${2 * Math.PI * 36}`}
+              strokeDashoffset={`${2 * Math.PI * 36 * (1 - progressPct / 100)}`}
+              strokeLinecap="round"
+              style={{ transform: "rotate(-90deg)", transformOrigin: "center", transition: "stroke-dashoffset 0.5s" }}
+            />
+          </svg>
+        )}
       </div>
 
       <div className="machine-info">
@@ -69,35 +171,39 @@ function MachineCard({ machine, userName, onSelect, onCancel }) {
         {status === "in_use" && timeRemaining != null && (
           <div className="time-remaining">
             <div className="time-bar-wrap">
-              <div className="time-bar" style={{ width: `${Math.min(100, (timeRemaining / 60) * 100)}%`, background: statusColor }} />
+              <div className="time-bar" style={{ width: `${progressPct}%`, background: statusColor }} />
             </div>
             <span>{timeRemaining} min left</span>
           </div>
         )}
 
         {status === "reserved" && reservedFor && (
-          <div className="reserved-info">Reserved: {reservedFor}</div>
+          <div className="reserved-info">Slot: {reservedFor}</div>
         )}
 
         {status === "done" && bookedBy && (
-          <div className="done-warning">⚠️ {bookedBy}: collect now to avoid penalty</div>
+          <div className="done-warning">⚠ {bookedBy}: collect within 15 min</div>
+        )}
+
+        {bookedBy && !isMyMachine && (
+          <div className="booked-by">by {bookedBy}</div>
         )}
       </div>
 
       <div className="machine-actions">
         {canBook && (
-          <button className="btn-primary btn-sm" onClick={() => onSelect(machine)}>
-            Book
+          <button className="btn-book" onClick={() => onSelect(machine)}>
+            Book Now
           </button>
         )}
         {isMyMachine && (status === "reserved" || status === "in_use") && (
-          <button className="btn-ghost btn-sm" onClick={() => onCancel(id)}>
+          <button className="btn-cancel-sm" onClick={() => onCancel(id)}>
             Cancel
           </button>
         )}
         {status === "done" && isMyMachine && (
-          <button className="btn-success btn-sm" onClick={() => onCancel(id)}>
-            Mark Collected
+          <button className="btn-collect" onClick={() => onCancel(id)}>
+            Mark Collected ✓
           </button>
         )}
       </div>
