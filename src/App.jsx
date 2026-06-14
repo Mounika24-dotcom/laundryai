@@ -5,6 +5,7 @@ import Dashboard from "./components/Dashboard";
 import BookingModal from "./components/BookingModal";
 import AIAdvisor from "./components/AIAdvisor";
 import WolframAnalytics from "./components/WolframAnalytics";
+import AdminDashboard from "./components/AdminDashboard";
 import Header from "./components/Header";
 import HistoryTab from "./components/HistoryTab";
 import NotificationToast from "./components/NotificationToast";
